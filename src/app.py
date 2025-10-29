@@ -11,6 +11,7 @@ app = Flask(__name__)
 def hello_world():
     return "Hello world!"
 
+
 posts = {
     0 : {"id":0,"upvotes":3,"title":"My first post!","link":"https://i.imgur.com/jseZqNK.jpg",
          "username":"Ciscognito16"}
@@ -24,8 +25,10 @@ comments = {
 }
 comment_counter = 1
 
+
+
 # your routes here
-@app.route("/api/posts/",methods="GET")
+@app.route("/api/posts/",methods=["GET"])
 def get_all_posts():
     """
     Get all posts
@@ -33,7 +36,8 @@ def get_all_posts():
     res = {"posts":list(posts.values())}
     return json.dumps(res),200
 
-@app.route("/api/posts/",methods="POST")
+
+@app.route("/api/posts/",methods=["POST"])
 def create_post():
     """
     Create a new post with fields "title", "link", "username" provided by the client
@@ -46,12 +50,14 @@ def create_post():
     if not title or not link or not username:
         return json.dumps({"error":"Fields missing"}),400
     
-    post = {"id": post_counter-1, "upvotes":0,"title":title,"link":link,"username":username}
-    posts[post_counter-1] = post
     post_counter += 1
+    post = {"id": post_counter-1, "upvotes":1,"title":title,"link":link,"username":username}
+    
+    posts[post_counter-1] = post
     return json.dumps(post),201
 
-@app.route("/api/posts/<int:post_id>/",methods="GET")
+
+@app.route("/api/posts/<int:post_id>/",methods=["GET"])
 def get_post_by_id(post_id):
     """
     Get post by id. If post doesn't exist, then return error code 404.
@@ -62,7 +68,8 @@ def get_post_by_id(post_id):
     
     return json.dumps(post),200
 
-@app.route("/api/posts/<int:post_id>/",methods="DELETE")
+
+@app.route("/api/posts/<int:post_id>/",methods=["DELETE"])
 def delete_post(post_id):
     """
     Delete post by id.
@@ -71,10 +78,12 @@ def delete_post(post_id):
     if not post:
         return json.dumps({"error":"Invalid id"}),404
     
-    del posts[post]
+    del posts[post_id]
     return json.dumps(post),200
 
-@app.route("/api/posts/<int:post_id>/comments/",methods="GET")
+
+
+@app.route("/api/posts/<int:post_id>/comments/",methods=["GET"])
 def get_comments_of_post(post_id):
     """
     Get comments of a post by post_id
@@ -82,11 +91,12 @@ def get_comments_of_post(post_id):
     post_comments = comments.get(post_id)
     if not post_comments:
         return json.dumps({"error":"Invalid id"}),404
-    res = {"comments":list(post_comments)}
+    res = {"comments":list(post_comments.values())}
 
     return json.dumps(res),200
 
-@app.route("/api/posts/<int:post_id>/comments/",methods="POST")
+
+@app.route("/api/posts/<int:post_id>/comments/",methods=["POST"])
 def post_comment(post_id):
     """
     Post comment on post_id. It must have text and username.
@@ -102,15 +112,18 @@ def post_comment(post_id):
     username = body.get("username")
     if not text or not username:
         return json.dumps({"error":"Missing text or username on comment."}),400
-    
-    new_comment = {"id":comment_counter-1,"upvotes":0,"text":text,"username":username}
-    comments[post_id][comment_counter-1] = new_comment
     comment_counter += 1
+    new_comment = {"id":comment_counter-1,"upvotes":0,"text":text,"username":username}
+
+
+    comments.setdefault(post_id,{})
+    comments[post_id][comment_counter-1] = new_comment
 
     return json.dumps(new_comment),201
 
-@app.route("/api/posts/<int:post_id>/comments/<int:comment_id>/",methods="POST")
-def post_comment(post_id,comment_id):
+
+@app.route("/api/posts/<int:post_id>/comments/<int:comment_id>/",methods=["POST"])
+def edit_comment(post_id,comment_id):
     """
     Edit comment_id on post_id by the same user. It must have text.
     """
