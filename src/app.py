@@ -177,6 +177,34 @@ def create_post_extra():
     
     posts[post_counter-1] = post
     return json.dumps(post),201
+
+@app.route("/api/extra/posts/<int:post_id>/",methods=["POST"])
+def add_upvotes(post_id):
+    """
+    Increment upvotes of a post. If no upvotes, then increment by 1.
+    """
+    post = posts.get(post_id)
+
+    if not post:
+        return jsonify({"error":"Post could not be found."}),404
+    body = json.loads(request.data)
+    upvotes = body.get("upvotes")
+    # Default behavior: if 'upvotes' is not provided, increment by 1
+    if upvotes is None:
+        post["upvotes"] += 1
+        return jsonify(post),200
+
+    # Validation: when provided, it must be an integer (can be positive, zero, or negative)
+    if not isinstance(upvotes, int):
+        return jsonify({"error":"Upvotes must be an int."}),400
+
+    # If negative, abs(upvotes) must be >= current number of upvotes
+    if upvotes < 0 and abs(upvotes) < post["upvotes"]:
+        return jsonify({"error":"If upvotes is negative, its absolute value must be greater than or equal to the current upvotes."}),400
+
+    post["upvotes"] += upvotes
+    
+    return jsonify(post),200
     
 @app.route("/api/extra/posts/<int:post_id>/comments/",methods=["POST"])
 def post_comment_extra(post_id):
@@ -225,6 +253,24 @@ def edit_comment_extra(post_id,comment_id):
     comments[post_id][comment_id]["text"] = text
 
     return json.dumps(comments[post_id][comment_id]),200
+
+@app.route("/api/extra/posts/",methods=["GET"])
+def get_all_posts_sorted():
+    """
+    Get all posts sorted by key sort and value increasing or decreasing
+    """
+    sort = request.args.get("sort")
+    posts_list = list(posts.values())
+
+    if sort == "increasing":
+        posts_list = sorted(posts_list, key=lambda x: x["upvotes"]) 
+    elif sort == "decreasing":
+        posts_list = sorted(posts_list, key=lambda x: -x["upvotes"]) 
+    elif sort is not None:  # invalid sort value provided
+        return jsonify({"error":"Invalid sort value. Use 'increasing' or 'decreasing'."}),400
+
+    res = {"posts": posts_list}
+    return json.dumps(res),200
 
 
 if __name__ == "__main__":
