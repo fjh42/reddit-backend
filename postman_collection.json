@@ -1,0 +1,202 @@
+{
+	"info": {
+		"_postman_id": "abdb9c47-0dbb-48fe-bed7-e7d9fb66706e",
+		"name": "reddit-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49308659",
+		"_collection_link": "https://solar-spaceship-2676354.postman.co/workspace/backend-dev-course~155bff9c-9254-4bd3-853d-e43b461ce41e/collection/49308659-abdb9c47-0dbb-48fe-bed7-e7d9fb66706e?action=share&source=collection_link&creator=49308659"
+	},
+	"item": [
+		{
+			"name": "Get-all-posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{localhost}}/posts/",
+					"host": [
+						"{{localhost}}"
+					],
+					"path": [
+						"posts",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create-new-post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"title\":\"Demon post #2\",\"link\":\"https://deadcells.wiki.gg/\",\"username\":\"user2\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{localhost}}/posts/",
+					"host": [
+						"{{localhost}}"
+					],
+					"path": [
+						"posts",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete-post-by-id",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"title\":\"Demo post id 2\",\"link\":\"https://deadcells.wiki.gg/\",\"username\":\"demouser1\"}"
+				},
+				"url": {
+					"raw": "{{localhost}}/posts/1/",
+					"host": [
+						"{{localhost}}"
+					],
+					"path": [
+						"posts",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get-post-by-id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{localhost}}/api/posts/1/",
+					"host": [
+						"{{localhost}}"
+					],
+					"path": [
+						"api",
+						"posts",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get-comments-of-post",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{localhost}}/posts/0/comments/",
+					"host": [
+						"{{localhost}}"
+					],
+					"path": [
+						"posts",
+						"0",
+						"comments",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post-comment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"text\":\"This post sucks!\",\r\n    \"username\": \"haterNumber1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{localhost}}/posts/1/comments/",
+					"host": [
+						"{{localhost}}"
+					],
+					"path": [
+						"posts",
+						"1",
+						"comments",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit-comment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"text\": \"post sucks (edit): so bad\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{localhost}}/posts/1/comments/1/",
+					"host": [
+						"{{localhost}}"
+					],
+					"path": [
+						"posts",
+						"1",
+						"comments",
+						"1",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

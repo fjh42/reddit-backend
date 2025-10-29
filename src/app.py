@@ -3,6 +3,7 @@ import json
 from flask import Flask
 from flask import jsonify
 from flask import request
+from urllib.parse import urlparse
 
 app = Flask(__name__)
 
@@ -144,8 +145,86 @@ def edit_comment(post_id,comment_id):
 
     return json.dumps(comments[post_id][comment_id]),200
 
+#Challenge section
+@app.route("/api/extra/posts/",methods=["POST"])
+def create_post_extra():
+    """
+    Create a new post with fields "title", "link", "username" provided by the client
+    """
+    global post_counter
+    body = json.loads(request.data)
+    title = body.get("title")
+    if not isinstance(title,str):
+        return json.dumps({"error":"title must be a string."}),400
 
+    link = body.get("link")
+    def is_valid_url(url):
+        try:
+            result = urlparse(url)
+            return result.scheme in ("http", "https") and bool(result.netloc)
+        except:
+            return False
+
+    if not isinstance(link,str) or not is_valid_url(link):
+        return json.dumps({"error":"title must be a string."}),400
     
+    username = body.get("username")
+    if not isinstance(username,str):
+        return json.dumps({"error":"Username must be a string"}),400
+    
+    post_counter += 1
+    post = {"id": post_counter-1, "upvotes":1,"title":title,"link":link,"username":username}
+    
+    posts[post_counter-1] = post
+    return json.dumps(post),201
+    
+@app.route("/api/extra/posts/<int:post_id>/comments/",methods=["POST"])
+def post_comment_extra(post_id):
+    """
+    Post comment on post_id. It must have text and username.
+    """
+    global comment_counter
+    body = json.loads(request.data)
+    post = posts.get(post_id)
+
+    if not post:
+        return json.dumps({"error":"Invalid post id."}),404
+
+    text = body.get("text")
+    username = body.get("username")
+    if not isinstance(text,str) or not isinstance(username,str):
+        return json.dumps({"error":"Text and username must be strings."}),400
+    comment_counter += 1
+    new_comment = {"id":comment_counter-1,"upvotes":0,"text":text,"username":username}
+
+
+    comments.setdefault(post_id,{})
+    comments[post_id][comment_counter-1] = new_comment
+
+    return json.dumps(new_comment),201
+
+
+@app.route("/api/extra/posts/<int:post_id>/comments/<int:comment_id>/",methods=["POST"])
+def edit_comment_extra(post_id,comment_id):
+    """
+    Edit comment_id on post_id by the same user. It must have text.
+    """
+    body = json.loads(request.data)
+    post_commented = comments.get(post_id)
+    if not post_commented:
+        return json.dumps({"error":"Post has no current comments."}),400
+    
+    comment = post_commented.get(comment_id)
+    if not post_commented:
+        return json.dumps({"error":"Invalid comment id."}),400
+
+    text = body.get("text")
+    if not isinstance(text,str):
+        return json.dumps({"error":"Text must be a string."}),400
+    
+    comments[post_id][comment_id]["text"] = text
+
+    return json.dumps(comments[post_id][comment_id]),200
 
 
 if __name__ == "__main__":
